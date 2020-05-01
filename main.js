@@ -7,6 +7,46 @@ ipcMain.on('file-save', (event, arg) => {
     saveFile(arg);
 })
 
+ipcMain.on('tail-start', (event, arg) => {
+    let loadedLines = arg;
+    run({
+        "host": "10.101.130.213",
+        "user": "root",
+        "pass": "root12",
+        "port": "122",
+    }, 'tail -f -n +' + loadedLines + ' /opt/ion/platform/log/MessageManager/LOGS/STATISTICS_01_05_2020.log');
+})
+
+
+const SSH = require('simple-ssh');
+
+function run(sshConfig, script) {
+    return new Promise((resolve, reject) => {
+        let scriptOutput = '';
+        const sshFtw = new SSH(sshConfig);
+        sshFtw.exec(script,
+            {
+                out: (data) => {
+                    win.webContents.send('ssh-data', data)
+                    console.log('got data....')
+                }
+            })
+            .on('error', (err) => {
+                reject(err);
+                console.log('got error....' + err);
+
+            })
+            .on('close', () => {
+                resolve(scriptOutput);
+                console.log('closed')
+            }
+            )
+            .start();
+    });
+};
+
+
+
 function saveFile(content) {
     dialog.showSaveDialog((fileName) => {
         if (fileName === undefined) {
@@ -28,7 +68,8 @@ function saveFile(content) {
 var win;
 function createWindow() {
     // Create the browser window.
-    win = new BrowserWindow({ width: 800, height: 600 })
+    win = new BrowserWindow({ width: 800, height: 600 });
+    win.maximize();
 
     // and load the index.html of the app.
     win.loadFile('dist/onex/index.html');
@@ -45,7 +86,6 @@ function onFileSelect(fileNames) {
             alert("An error ocurred reading the file :" + err.message);
             return;
         } else {
-            console.log(data.toString());
         }
 
         // Change how to handle the file content
@@ -91,6 +131,23 @@ const template = [
                     }
 
                 });
+            }
+        },
+        {
+            label: 'Open SSH',
+
+            role: 'openSSH',
+            accelerator: 'CommandOrControl+X',
+            click() {
+                win.webContents.send('file-new', 'new');
+                run({
+                    "host": "10.101.130.213",
+                    "user": "root",
+                    "pass": "root12",
+                    "port": "122",
+                    //                }, 'tail -f -n +1 /opt/ion/platform/log/MessageManager/LOGS/MM_27_04_2020.log');
+                }, 'cat /opt/ion/platform/log/MessageManager/LOGS/STATISTICS_01_05_2020.log');
+
             }
         },
         {

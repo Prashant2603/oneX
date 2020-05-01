@@ -38,6 +38,12 @@ export class IpcService {
     })
   }
 
+  public onData(listener: any): void {
+    this._ipc.on('ssh-data', (event, data) => {
+      listener(data);
+    })
+  }
+
   public onSaveRequest(listener: any): void {
     this._ipc.on('file-save-request', (event, message) => {
       listener(message);
@@ -52,6 +58,9 @@ export class IpcService {
     this.send('file-save', data)
   }
 
+  public tail(data): void {
+    this.send('tail-start', data)
+  }
   public onSaveCallback(listener): void {
     this._ipc.on('file-saved', (event, message) => {
       listener(message);

@@ -6,6 +6,8 @@ export class AppModel {
 export interface OFile {
   name: string,
   content: string,
-  active?: boolean
+  active?: boolean,
+  info: string,
+  id: string
 }
 

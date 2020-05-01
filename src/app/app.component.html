@@ -1,7 +1,27 @@
 <!--The content below is only a placeholder and can be replaced.-->
+<div class="editor">
 
-<tabset>
-  <tab *ngFor="let file of fileModel.files; let i = index" (select)="onSelect($event)" heading="{{file.name}}">
-    <textarea class="textarea" [(ngModel)]="file.content"></textarea>
-  </tab>
-</tabset>
+  <tabset [vertical]="true" type="pills">
+    <tab *ngFor="let file of fileModel.files; let i = index" [active]="file.active" (select)="onSelect($event)" heading="{{file.name}}">
+      <div style="height:100%" class="flex-column flex-child flex-container">
+        <div class="header">
+          <div class="filler" style="width:50%"></div>
+          <input class="filter" name="search" type="search" (change)="onFilterChange($event)" placeholder="Search" [(ngModel)]="textFilter"
+          />
+          <button type="button" class="btn btn-primary" [(ngModel)]="tailMode" btnCheckbox (click)="toggleTailMode()" btnCheckboxTrue="1"
+            btnCheckboxFalse="0">
+            Tail
+          </button>
+        </div>
+        <div class=" flex-container flex-child" style="padding-top:8px;">
+          <div class="line-numbers"></div>
+          <div class="flex-container flex-child">
+            <div [id]="file.id" name="file.id" ngDefaultControl class="textarea flex-child">{{file.info}}</div>
+          </div>
+        </div>
+      </div>
+    </tab>
+  </tabset>
+  <div class="footer"></div>
+
+</div>
